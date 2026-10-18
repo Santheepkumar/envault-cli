@@ -1,0 +1,12 @@
+{
+  "protocol": 1,
+  "release": "0.1.0",
+  "files": {
+    "contracts.ts": "de2652505646a8cef35a816b12a4b772b9ea653b9c6821faf5379008722349ec",
+    "openapi.json": "2dafb990feb02487f1d1df62dcf3f9f37f315f317a3f2be9e55812a60dd025ef",
+    "vectors.json": "cb12e3d2c186e8c669a321f53606a6513717e4ecb662081b705b2acd8fb0fe01",
+    "parser-vectors.json": "c092522d37f1ab1ae450a35268b459aed52d9ea6f6a69eea5dc67df8367ccdd4",
+    "crypto.md": "51f395953406090b889cffd51ca687e417f718d7d76b5f15b107d6f2ddb049fc",
+    "dotenv.md": "2bc2afbccdd98e46c665e29537e4c8dd8b2a40763448d7b4122cb53a3adba36b"
+  }
+}

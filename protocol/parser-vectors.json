@@ -1,0 +1,10 @@
+[
+ {"input":"# note\r\nexport API_URL=https://example.test\r\nEMPTY=\r\n","values":{"API_URL":"https://example.test","EMPTY":""}},
+ {"input":"A='line one\nline two'\nB=\"hello\\nworld\" # note\n","values":{"A":"line one\nline two","B":"hello\nworld"}},
+ {"input":"A=${HOME}\nB=$(whoami)\nC=hello#world\nD=value # comment\n","values":{"A":"${HOME}","B":"$(whoami)","C":"hello#world","D":"value"}},
+ {"input":"A=1\nA=2\n","error":true},
+ {"input":"BAD-NAME=value","error":true},
+ {"input":"A=\"unterminated","error":true},
+ {"input":"A='ok'bad","error":true},
+ {"input":"A=has\u0000nul","error":true}
+]

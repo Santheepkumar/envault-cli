@@ -1,0 +1,90 @@
+{
+  "account": {
+    "kdf": {
+      "iterations": 3,
+      "memory": 65536,
+      "name": "argon2id",
+      "parallelism": 4
+    },
+    "passwordWrap": {
+      "ciphertext": "VNhYI07JSCLt9jeFaSrNNmmrNLJR3ykWmBH1MW49A31es1LQW8Sa+UpY7zjQU0xj",
+      "nonce": "YPTT2fWBqd47DL8g",
+      "v": 1
+    },
+    "privateKey": {
+      "ciphertext": "q7gRGT/ry1zxt2BhlCosBmdrwTtk9l6JHwVrfYPlB6+VizKSNQt4D0XaXJi6Lm6/",
+      "nonce": "h6x2+6RZ55Xla93h",
+      "v": 1
+    },
+    "publicKey": "4/SHdEIA7S+9E7ItvLqYNH8PGs6e8DXWrw1d8MQbzDU=",
+    "recoveryWrap": {
+      "ciphertext": "Lu6Ipay3ZlrXGtTw2QXYvPX1sJv2Wx3nE7yFh2flGARWCAzBDgJohpqIZizzKC2p",
+      "nonce": "bOWKScdWAogK/MTC",
+      "v": 1
+    },
+    "salt": "BWHe15spaJw1AWdZkFZGMg==",
+    "v": 1
+  },
+  "box": {
+    "ciphertext": "9n4G6jvDGF0mYVsxCgKf35pwgYNM2A0P14+0HXF9JwZ78eEWzEX4CYvO+gNqxFdrkQLYaYGK560kjw9xYdkvPb61j/288ay030OmEJU=",
+    "nonce": "TkfX+/4HvHg5Ai1O",
+    "v": 1
+  },
+  "context": {
+    "environment": "dev",
+    "epoch": 1,
+    "projectId": "22222222-2222-4222-8222-222222222222"
+  },
+  "goBox": {
+    "v": 1,
+    "nonce": "P+732C2EK6lX6NR6",
+    "ciphertext": "gyOIu2odpa4a8ccxzs9+E60amcblcwCicCQN8hrQN2MMm8glO0gwvYEwxly7mw2wTgT0TNZ/3h+yBrsFYhLGYHx203WhEKTZlC+FGos="
+  },
+  "goRecoveredAccount": {
+    "v": 1,
+    "publicKey": "4/SHdEIA7S+9E7ItvLqYNH8PGs6e8DXWrw1d8MQbzDU=",
+    "salt": "xDdwbxKrXecLi6pbSxK7lg==",
+    "kdf": {
+      "name": "argon2id",
+      "memory": 65536,
+      "iterations": 3,
+      "parallelism": 4
+    },
+    "passwordWrap": {
+      "v": 1,
+      "nonce": "f8KcgByWaWNVtJ6E",
+      "ciphertext": "YSCMOyXWQmysL3ejY8WzcEOkQQttVOC7owsk9b4G4FRdj5aQtvrST3aN5Q2sGi7w"
+    },
+    "recoveryWrap": {
+      "v": 1,
+      "nonce": "bOWKScdWAogK/MTC",
+      "ciphertext": "Lu6Ipay3ZlrXGtTw2QXYvPX1sJv2Wx3nE7yFh2flGARWCAzBDgJohpqIZizzKC2p"
+    },
+    "privateKey": {
+      "v": 1,
+      "nonce": "h6x2+6RZ55Xla93h",
+      "ciphertext": "q7gRGT/ry1zxt2BhlCosBmdrwTtk9l6JHwVrfYPlB6+VizKSNQt4D0XaXJi6Lm6/"
+    }
+  },
+  "goWrap": {
+    "v": 1,
+    "nonce": "u5kWWmaOHGf7eCHA",
+    "ciphertext": "4qOAcuheiBhQG1ioT9GKgSJ4CrGCd5fYziPKD62nr+PojMnaaQ2MMSGhewHUTmiV",
+    "ephemeralPublicKey": "LGbDwyKysBebdXp0GkR7w3R+npErwFAEfq9H41BM6gw="
+  },
+  "key": "CQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk=",
+  "password": "test-vector-password-only",
+  "plaintext": "API_URL=\"https://example.test\"\nUNICODE=வணக்கம்\n",
+  "privateKey": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=",
+  "publicKey": "E75P6uryBMf9M1j8nAByGIHRdCeBKCJ+xnTzf3/pe20=",
+  "recoveryKey": "nkRqIlDlhRRotMczgf2rIUsL64kUv7eL5OMbbq+gTS4=",
+  "revisionId": "33333333-3333-4333-8333-333333333333",
+  "userId": "11111111-1111-4111-8111-111111111111",
+  "v": 1,
+  "wrap": {
+    "ciphertext": "ZY4lkNTxly4OLUtoYpm8NePB304YBGqR0H6Z/teSfOWmwq2DEIlWjD680FDs8nP7",
+    "ephemeralPublicKey": "fx1fxptS49r0DOV8eenKDT4lZYyBCrs71TlQKItoOxI=",
+    "nonce": "OosCd2GDCT9HxA8H",
+    "v": 1
+  }
+}

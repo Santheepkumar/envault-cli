@@ -1,0 +1,7 @@
+/bin/
+/dist/
+.env*
+.envault.json
+*.pem
+*.key
+.DS_Store
