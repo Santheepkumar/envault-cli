@@ -1,0 +1,37 @@
+version: 2
+project_name: envault
+builds:
+  - id: envault
+    main: ./cmd/envault
+    binary: envault
+    env: [CGO_ENABLED=0]
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags: [-trimpath]
+    ldflags: ['-s -w -X main.version={{.Version}} -buildid=']
+archives:
+  - formats: [tar.gz]
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files: [LICENSE, README.md, protocol/**, docs/**]
+checksum:
+  name_template: checksums.txt
+signs:
+  - cmd: cosign
+    artifacts: checksum
+    certificate: '${artifact}.pem'
+    signature: '${artifact}.sig'
+    args:
+      - sign-blob
+      - --yes
+      - --output-certificate=${certificate}
+      - --output-signature=${signature}
+      - '${artifact}'
+    output: true
+release:
+  draft: true
+changelog:
+  use: git

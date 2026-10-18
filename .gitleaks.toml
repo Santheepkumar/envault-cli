@@ -1,0 +1,6 @@
+title = "EnVault public CLI"
+[extend]
+useDefault = true
+[allowlist]
+description = "Deliberately public interoperability fixtures"
+paths = ['''protocol/(vectors|manifest)\.json$''']
