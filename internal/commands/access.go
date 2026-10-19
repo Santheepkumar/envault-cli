@@ -25,7 +25,7 @@ func accessCommands(o *options) []*cobra.Command {
 			return e
 		}
 		var r any
-		if e = a.Do(cmd.Context(), "GET", "/projects/"+o.project+"/members", nil, &r); e != nil {
+		if e = a.Do(cmd.Context(), "GET", pagePath(cmd, "/projects/"+o.project+"/members"), nil, &r); e != nil {
 			return e
 		}
 		return printJSON(r)
@@ -64,13 +64,11 @@ func accessCommands(o *options) []*cobra.Command {
 			return e
 		}
 		defer c.Close()
-		var r struct {
-			Members []member `json:"members"`
-		}
-		if e = c.API.Do(cmd.Context(), "GET", "/projects/"+c.ProjectID+"/members", nil, &r); e != nil {
+		m, e := findMember(cmd.Context(), c.API, c.ProjectID, args[0])
+		if e != nil {
 			return e
 		}
-		for _, m := range r.Members {
+		for _, m := range []member{m} {
 			if m.UserID != args[0] {
 				continue
 			}
@@ -129,6 +127,7 @@ func accessCommands(o *options) []*cobra.Command {
 		}
 		return c.API.Do(cmd.Context(), "POST", "/projects/"+c.ProjectID+"/confirm-owner-access", confirmed, nil)
 	}}
+	addPagination(list, true)
 	members.AddCommand(list, invite, accept, grant, remove, role, confirm)
 	credentials := &cobra.Command{Use: "credentials", Short: "Manage environment-scoped machine credentials"}
 	create := &cobra.Command{Use: "create LABEL", Args: cobra.ExactArgs(1)}
@@ -171,7 +170,7 @@ func accessCommands(o *options) []*cobra.Command {
 			return e
 		}
 		var r any
-		if e = a.Do(cmd.Context(), "GET", "/projects/"+o.project+"/credentials", nil, &r); e != nil {
+		if e = a.Do(cmd.Context(), "GET", pagePath(cmd, "/projects/"+o.project+"/credentials"), nil, &r); e != nil {
 			return e
 		}
 		return printJSON(r)
@@ -183,6 +182,7 @@ func accessCommands(o *options) []*cobra.Command {
 		}
 		return a.Do(cmd.Context(), "DELETE", "/projects/"+o.project+"/credentials/"+args[0], nil, nil)
 	}}
+	addPagination(clist, true)
 	credentials.AddCommand(create, clist, revoke)
 	rotate := &cobra.Command{Use: "rotate", Short: "Rotate this environment and re-encrypt its current secrets", Args: cobra.NoArgs}
 	var verified bool

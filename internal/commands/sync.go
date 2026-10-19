@@ -37,7 +37,7 @@ func syncCommands(o *options) []*cobra.Command {
 			return e
 		}
 		var result any
-		if e = a.Do(cmd.Context(), "GET", "/projects", nil, &result); e != nil {
+		if e = a.Do(cmd.Context(), "GET", pagePath(cmd, "/projects"), nil, &result); e != nil {
 			return e
 		}
 		return printJSON(result)
@@ -143,7 +143,7 @@ func syncCommands(o *options) []*cobra.Command {
 			return fmt.Errorf("select a project first")
 		}
 		var result any
-		if e = a.Do(cmd.Context(), "GET", "/projects/"+o.project+"/environments/"+o.environment+"/versions", nil, &result); e != nil {
+		if e = a.Do(cmd.Context(), "GET", pagePath(cmd, "/projects/"+o.project+"/environments/"+o.environment+"/versions"), nil, &result); e != nil {
 			return e
 		}
 		return printJSON(result)
@@ -173,5 +173,7 @@ func syncCommands(o *options) []*cobra.Command {
 		fmt.Fprintf(cmd.OutOrStdout(), "Restored as version %d\n", next.Version)
 		return nil
 	}}
+	addPagination(projects, true)
+	addPagination(history, false)
 	return []*cobra.Command{init, projects, push, pull, run, history, restore}
 }

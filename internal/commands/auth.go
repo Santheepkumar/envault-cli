@@ -79,20 +79,17 @@ func authCommands(o *options) []*cobra.Command {
 	recover.Flags().StringVar(&kit, "kit", "", "Recovery kit JSON file")
 	_ = recover.MarkFlagRequired("kit")
 	recover.RunE = func(cmd *cobra.Command, _ []string) error {
+		file, e := os.Open(kit)
+		if e != nil {
+			return e
+		}
+		recovery, e := readRecoveryKit(file, o.origin)
+		_ = file.Close()
+		if e != nil {
+			return e
+		}
 		a, e := humanAPI(o)
 		if e != nil {
-			return e
-		}
-		b, e := os.ReadFile(kit)
-		if e != nil {
-			return e
-		}
-		defer vcrypto.Clear(b)
-		var recovery struct {
-			UserID      string `json:"userId"`
-			RecoveryKey string `json:"recoveryKey"`
-		}
-		if e = json.Unmarshal(b, &recovery); e != nil {
 			return e
 		}
 		var result struct {

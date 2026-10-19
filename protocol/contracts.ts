@@ -6,6 +6,43 @@ export const environments = ["dev", "staging", "prod"] as const;
 export type Environment = (typeof environments)[number];
 export const environmentSchema = z.enum(environments);
 export const idSchema = z.uuid();
+// New collection endpoints use a stable descending UUID cursor. History keeps
+// its existing numeric version cursor; cursors are never interchangeable.
+export const pageSchema = z.strictObject({
+  before: idSchema.optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+});
+export const accountCredentialSchema = z.strictObject({
+  id: idSchema,
+  label: z.string(),
+  createdAt: z.string(),
+  expiresAt: z.string(),
+  revokedAt: z.string().nullable(),
+});
+export const accountCredentialsSchema = z.strictObject({
+  credentials: z.array(accountCredentialSchema),
+  nextCursor: idSchema.nullable(),
+});
+export type AccountCredential = z.infer<typeof accountCredentialSchema>;
+export const recoveryKitSchema = z.strictObject({
+  v: z.literal(1),
+  apiUrl: z.url().refine((value) => {
+    const url = new URL(value);
+    return (
+      !url.username &&
+      !url.password &&
+      url.pathname === "/" &&
+      !url.search &&
+      !url.hash &&
+      (url.protocol === "https:" ||
+        (url.protocol === "http:" &&
+          ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)))
+    );
+  }, "Recovery kit must use an HTTPS installation origin or local development origin"),
+  userId: idSchema,
+  recoveryKey: z.string().regex(/^[A-Za-z0-9+/]{43}=$/),
+});
+export type RecoveryKit = z.infer<typeof recoveryKitSchema>;
 const base64 = z
   .string()
   .max(1_400_000)
