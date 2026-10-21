@@ -12,7 +12,7 @@ The private application CI checks out this public repository at a reviewed commi
 
 ## 2. Validate a release candidate
 
-Use the Go toolchain pinned in `go.mod` (currently 1.26.9) and GoReleaser 2.18.3, matching the workflow. From the CLI repository:
+Use the Go toolchain pinned in `go.mod` (currently 1.26.10) and GoReleaser 2.18.3, matching the workflow. From the CLI repository:
 
 ```sh
 go mod verify

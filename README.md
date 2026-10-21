@@ -1,6 +1,6 @@
 # EnVault CLI
 
-A native Go CLI for client-encrypted environment synchronization. No Node.js runtime is required. Build with Go 1.26.9 or install a verified native release from your team's public CLI repository.
+A native Go CLI for client-encrypted environment synchronization. No Node.js runtime is required. Build with Go 1.26.10 or install a verified native release from your team's public CLI repository.
 
 ```sh
 go build -trimpath -o bin/envault ./cmd/envault
