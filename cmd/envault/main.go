@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/envault/cli/internal/commands"
-	"github.com/envault/cli/internal/process"
+	"github.com/Santheepkumar/envault-cli/internal/commands"
+	"github.com/Santheepkumar/envault-cli/internal/process"
 	"os"
 	"os/exec"
 )

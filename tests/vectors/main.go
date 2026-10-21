@@ -3,7 +3,7 @@ package main
 
 import (
 	"encoding/json"
-	vcrypto "github.com/envault/cli/internal/crypto"
+	vcrypto "github.com/Santheepkumar/envault-cli/internal/crypto"
 	"os"
 )
 

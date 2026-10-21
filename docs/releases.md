@@ -4,11 +4,11 @@ This repository publishes the `envault` binary for macOS, Linux and Windows on a
 
 ## 1. Configure the actual public repository
 
-Choose an organization/repository you control. `github.com/envault/cli` is currently a module-path placeholder, not a claim to that namespace. Before the first public release, replace that prefix in `go.mod` and Go imports, run `gofmt`, `go mod tidy`, and the checks below. Set the actual Git remote and enable private vulnerability reporting, branch protection and required native CI checks. Never publish the sibling private application repository or its configuration/secrets.
+The public module and repository are `github.com/Santheepkumar/envault-cli` and `Santheepkumar/envault-cli`. Before the first public release, enable private vulnerability reporting, branch protection and required native CI checks. Never publish the sibling private application repository or its configuration/secrets.
 
 Configure GitHub Actions with read-only default permissions and enable OIDC/attestations for the release job. The checked-in workflow explicitly grants `contents:write`, `id-token:write` and `attestations:write` to that job. It uses `GITHUB_TOKEN`; no long-lived publication token is required for the repository's own releases. Set an environment review rule if your organization requires publication approval.
 
-In the private application CI, set `ENVAULT_CLI_REPOSITORY` to the public `OWNER/REPOSITORY`. After each approved release, update `ENVAULT_CLI_REF` and the pinned protocol snapshot together. Compatibility checks must pass without access to private application source from the public CLI workflow.
+The private application CI checks out this public repository at a reviewed commit SHA. Update that SHA after each approved CLI change, and update the pinned protocol snapshot only when the protocol changes. Compatibility checks must pass without access to private application source from the public CLI workflow.
 
 ## 2. Validate a release candidate
 
@@ -45,7 +45,7 @@ These commands publish Git state and trigger the release workflow; run them only
 git tag -a v0.1.0 -m 'EnVault v0.1.0'
 git push origin v0.1.0
 gh run list --workflow release.yml --limit 5
-gh release view v0.1.0 --repo OWNER/REPOSITORY
+gh release view v0.1.0 --repo Santheepkumar/envault-cli
 ```
 
 The tag workflow first runs native checks, then GoReleaser creates a **draft** containing archives, checksum signatures/certificates and protocol documentation. GitHub also records build attestations. Check that the draft commit equals the reviewed tag and that there are no unexpected assets. If any job fails, keep the draft unpublished and diagnose the failure; do not bypass native/security gates.
@@ -53,7 +53,7 @@ The tag workflow first runs native checks, then GoReleaser creates a **draft** c
 Download the candidate assets into an empty directory. Draft asset access requires an authenticated maintainer:
 
 ```sh
-gh release download v0.1.0 --repo OWNER/REPOSITORY --dir candidate
+gh release download v0.1.0 --repo Santheepkumar/envault-cli --dir candidate
 ```
 
 ## 4. Verify assets before installation
@@ -63,10 +63,10 @@ Install `cosign` and GitHub CLI through their official channels. Use the actual 
 ```sh
 cosign verify-blob checksums.txt --signature checksums.txt.sig \
   --certificate checksums.txt.pem \
-  --certificate-identity 'https://github.com/OWNER/REPOSITORY/.github/workflows/release.yml@refs/tags/v0.1.0' \
+  --certificate-identity 'https://github.com/Santheepkumar/envault-cli/.github/workflows/release.yml@refs/tags/v0.1.0' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 sha256sum --check checksums.txt
-gh attestation verify ./envault_0.1.0_linux_amd64.tar.gz --repo OWNER/REPOSITORY
+gh attestation verify ./envault_0.1.0_linux_amd64.tar.gz --repo Santheepkumar/envault-cli
 ```
 
 Checksum verification must follow successful signature verification. Run attestation verification for each archive being distributed. Verify its subject digest and repository/workflow identity. On macOS use `shasum -a 256 -c checksums.txt`; on Windows compare `Get-FileHash -Algorithm SHA256 .\envault_0.1.0_windows_amd64.zip` with that archive's exact entry in the authenticated checksum file. A failure blocks installation and publication.
@@ -105,7 +105,7 @@ Native CI now includes process-tree cancellation regressions. Cross-compilation 
 After signature/provenance and all native staging checks pass, inspect release notes and assets once more, then explicitly publish the reviewed draft:
 
 ```sh
-gh release edit v0.1.0 --repo OWNER/REPOSITORY --draft=false
+gh release edit v0.1.0 --repo Santheepkumar/envault-cli --draft=false
 ```
 
 Publish only the same assets already verified. Update installation documentation and the private application's pinned CLI release/reference; run compatibility CI before deploying the app. Keep previous valid artifacts available for rollback.

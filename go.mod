@@ -1,4 +1,4 @@
-module github.com/envault/cli
+module github.com/Santheepkumar/envault-cli
 
 go 1.26.9
 

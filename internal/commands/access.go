@@ -2,9 +2,9 @@ package commands
 
 import (
 	"fmt"
-	"github.com/envault/cli/internal/config"
-	vcrypto "github.com/envault/cli/internal/crypto"
-	"github.com/envault/cli/internal/vault"
+	"github.com/Santheepkumar/envault-cli/internal/config"
+	vcrypto "github.com/Santheepkumar/envault-cli/internal/crypto"
+	"github.com/Santheepkumar/envault-cli/internal/vault"
 	"github.com/spf13/cobra"
 	"os"
 	"strings"

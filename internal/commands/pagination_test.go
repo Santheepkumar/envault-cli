@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/envault/cli/internal/api"
+	"github.com/Santheepkumar/envault-cli/internal/api"
 	"github.com/spf13/cobra"
 )
 

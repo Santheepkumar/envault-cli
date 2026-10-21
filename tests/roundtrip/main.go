@@ -5,9 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/envault/cli/internal/api"
-	vcrypto "github.com/envault/cli/internal/crypto"
-	"github.com/envault/cli/internal/vault"
+	"github.com/Santheepkumar/envault-cli/internal/api"
+	vcrypto "github.com/Santheepkumar/envault-cli/internal/crypto"
+	"github.com/Santheepkumar/envault-cli/internal/vault"
 	"os"
 )
 

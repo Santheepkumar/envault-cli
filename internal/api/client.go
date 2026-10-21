@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/envault/cli/internal/config"
+	"github.com/Santheepkumar/envault-cli/internal/config"
 	"io"
 	"net/http"
 	"time"

@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/envault/cli/internal/config"
-	vcrypto "github.com/envault/cli/internal/crypto"
+	"github.com/Santheepkumar/envault-cli/internal/config"
+	vcrypto "github.com/Santheepkumar/envault-cli/internal/crypto"
 )
 
 const recoveryKitLimit = 16 * 1024

@@ -7,7 +7,7 @@ go build -trimpath -o bin/envault ./cmd/envault
 ./bin/envault --help
 ```
 
-Before publishing, change `github.com/envault/cli` in `go.mod` and internal imports to your actual public repository path. This workspace has no configured remote and does not imply ownership of that GitHub namespace.
+The public Go module is `github.com/Santheepkumar/envault-cli`. Build or install releases from that repository.
 
 Application operators should follow the private application repository’s local setup and testing guides. This public repository’s [release guide](docs/releases.md) is self-contained for binary verification and installation.
 

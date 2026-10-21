@@ -3,8 +3,8 @@ package vault
 import (
 	"context"
 	"encoding/json"
-	"github.com/envault/cli/internal/api"
-	vcrypto "github.com/envault/cli/internal/crypto"
+	"github.com/Santheepkumar/envault-cli/internal/api"
+	vcrypto "github.com/Santheepkumar/envault-cli/internal/crypto"
 	"net/http"
 	"net/http/httptest"
 	"testing"
