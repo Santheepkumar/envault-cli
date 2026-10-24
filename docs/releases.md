@@ -123,3 +123,9 @@ Builds disable CGO, trim paths, pin module sums, use commit timestamps and versi
 Local validation of this readiness change: macOS Go race tests and encrypted file-byte regressions pass; Windows tests compile but have not executed here. Publication/tagging commands in this guide have not been executed. See the application verification record for the combined acceptance status.
 
 Official references: [GoReleaser checks](https://goreleaser.com/cmd/goreleaser_check/), [snapshot releases](https://goreleaser.com/customization/snapshots/), [Windows Job Objects](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects), and [console process groups](https://learn.microsoft.com/en-us/windows/console/console-process-groups).
+
+## Onboarding rollout
+
+The onboarding update changes fresh CLI installations from localhost to the hosted origin `https://d3z7pylxp15sx.cloudfront.net`. Local and self-hosted users supply `login --api-url ORIGIN` once; existing project bindings retain their origin. The protocol and machine bundle format are unchanged.
+
+Publish and verify the native CLI release before deploying dashboard quick-reference instructions that omit repeated URLs. After the reviewed CLI commit is available in the public repository, update the private application's pinned CLI reference in `.github/workflows/ci.yml` to that exact commit and run application compatibility CI. Do not point the pin at an unpublished or guessed commit. Source changes alone do not establish native browser/keychain verification or release readiness.

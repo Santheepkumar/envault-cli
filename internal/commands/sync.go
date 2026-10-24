@@ -10,27 +10,7 @@ import (
 )
 
 func syncCommands(o *options) []*cobra.Command {
-	init := &cobra.Command{Use: "init", Short: "Link this directory to a project, or create one", Args: cobra.NoArgs}
-	var name string
-	init.Flags().StringVar(&name, "name", "", "Create a project with this name")
-	init.RunE = func(cmd *cobra.Command, _ []string) error {
-		if name != "" {
-			c, e := unlocked(cmd.Context(), o)
-			if e != nil {
-				return e
-			}
-			defer c.Close()
-			id, e := c.CreateProject(cmd.Context(), name)
-			if e != nil {
-				return e
-			}
-			o.project = id
-		}
-		if o.project == "" {
-			return fmt.Errorf("provide --project or --name")
-		}
-		return config.Save(config.Project{APIURL: o.origin, ProjectID: o.project})
-	}
+	init := initCommand(o)
 	projects := &cobra.Command{Use: "projects", Short: "List accessible projects", Args: cobra.NoArgs, RunE: func(cmd *cobra.Command, _ []string) error {
 		a, e := humanAPI(o)
 		if e != nil {

@@ -12,31 +12,52 @@ import (
 	"github.com/Santheepkumar/envault-cli/internal/vault"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
+	"io"
 	"os"
 	"strings"
+	"time"
 )
 
+type commandDeps struct {
+	getToken     func(string) (string, error)
+	setToken     func(string, string) error
+	deleteToken  func(string) error
+	terminal     func(io.Reader) bool
+	openBrowser  func(string) error
+	pollInterval time.Duration
+}
+
 type options struct {
-	origin, project, environment string
-	passwordStdin                bool
-	envExplicit                  bool
+	origin, project, environment     string
+	passwordStdin                    bool
+	envExplicit                      bool
+	source, configPath, legacyOrigin string
+	binding                          config.Project
+	deps                             commandDeps
+	input                            io.Reader
+	reader                           *bufio.Reader
+	stderr                           io.Writer
 }
 
 func New(version string) *cobra.Command {
-	o := &options{origin: "http://127.0.0.1:3000", environment: "dev"}
-	if c, e := config.Load(); e == nil {
-		o.origin = strings.TrimRight(c.APIURL, "/")
-		o.project = c.ProjectID
-	}
+	return newCommand(version, commandDeps{
+		getToken: credentials.Get, setToken: credentials.Set, deleteToken: credentials.Delete,
+		terminal: terminalInput, openBrowser: openBrowser, pollInterval: 5 * time.Second,
+	})
+}
+
+func newCommand(version string, deps commandDeps) *cobra.Command {
+	o := &options{origin: config.DefaultOrigin, environment: "dev", deps: deps}
 	root := &cobra.Command{Use: "envault", Short: "Encrypted environment secrets for your team", Version: version, SilenceUsage: true, SilenceErrors: true}
 	root.PersistentFlags().StringVar(&o.origin, "api-url", o.origin, "EnVault application origin")
 	root.PersistentFlags().StringVar(&o.project, "project", o.project, "Project UUID")
 	root.PersistentFlags().StringVar(&o.environment, "env", "dev", "Environment: dev, staging, prod")
 	root.PersistentFlags().BoolVar(&o.passwordStdin, "password-stdin", false, "Read the vault password from one line of stdin")
 	root.PersistentPreRunE = func(cmd *cobra.Command, _ []string) error {
-		o.origin = strings.TrimRight(o.origin, "/")
+		o.input, o.stderr = cmd.InOrStdin(), cmd.ErrOrStderr()
+		o.reader = bufio.NewReader(o.input)
 		o.envExplicit = cmd.Flags().Changed("env")
-		if e := config.ValidateURL(o.origin); e != nil {
+		if e := resolveOptions(cmd, o); e != nil {
 			return e
 		}
 		if o.environment != "dev" && o.environment != "staging" && o.environment != "prod" {
@@ -47,31 +68,137 @@ func New(version string) *cobra.Command {
 	root.AddCommand(authCommands(o)...)
 	root.AddCommand(syncCommands(o)...)
 	root.AddCommand(accessCommands(o)...)
+	root.AddCommand(statusCommand(o))
 	return root
 }
+
+func terminalInput(r io.Reader) bool {
+	f, ok := r.(*os.File)
+	return ok && term.IsTerminal(int(f.Fd()))
+}
+
+func resolveOptions(cmd *cobra.Command, o *options) error {
+	c, path, err := config.Find()
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	o.binding, o.configPath = c, path
+	if !cmd.Flags().Changed("project") {
+		o.project = c.ProjectID
+	}
+	o.source = "hosted default"
+	// Machine bundles own their installation; human defaults must not interfere.
+	if raw := os.Getenv("ENVAULT_MACHINE"); raw != "" && (cmd.Name() == "pull" || cmd.Name() == "push" || cmd.Name() == "run" || cmd.Name() == "status") {
+		b, err := vault.ParseMachine(raw)
+		if err != nil {
+			return err
+		}
+		if cmd.Flags().Changed("api-url") {
+			explicit, e := config.NormalizeURL(o.origin)
+			bundle, be := config.NormalizeURL(b.APIURL)
+			if e != nil || be != nil || explicit != bundle {
+				return errors.New("machine credential installation mismatch")
+			}
+		}
+		o.origin, o.source = b.APIURL, "machine credential"
+	} else if cmd.Flags().Changed("api-url") {
+		o.source = "--api-url"
+	} else if path != "" {
+		o.origin, o.source = c.APIURL, path
+	} else {
+		u, err := config.LoadUser()
+		if err != nil {
+			return err
+		}
+		if u.APIURL != "" {
+			o.origin, o.source = u.APIURL, "user configuration"
+		}
+	}
+	o.legacyOrigin = strings.TrimRight(o.origin, "/")
+	o.origin, err = config.NormalizeURL(o.origin)
+	if err != nil {
+		return err
+	}
+	if path != "" {
+		bound, _ := config.NormalizeURL(c.APIURL)
+		if bound == o.origin && strings.TrimRight(c.APIURL, "/") != o.origin {
+			o.legacyOrigin = strings.TrimRight(c.APIURL, "/")
+		}
+	}
+	if o.legacyOrigin != o.origin {
+		if err := config.MigratePins(o.legacyOrigin, o.origin); err != nil {
+			return err
+		}
+	}
+	if path != "" && cmd.Flags().Changed("api-url") && !cmd.Flags().Changed("project") && projectOperation(cmd) {
+		bound, _ := config.NormalizeURL(c.APIURL)
+		if bound != o.origin {
+			return errors.New("installation differs from linked project; use envault init to relink, or explicitly provide both --api-url and --project")
+		}
+	}
+	return nil
+}
+
+func projectOperation(cmd *cobra.Command) bool {
+	switch cmd.Name() {
+	case "login", "logout", "recover", "projects", "init", "status":
+		return false
+	}
+	return true
+}
+
+func loginHint(origin string) string {
+	if origin == config.DefaultOrigin {
+		return "run envault login"
+	}
+	return "run envault login --api-url " + origin
+}
 func password(o *options, prompt string) (string, error) {
-	fmt.Fprint(os.Stderr, prompt+": ")
+	if o.input == nil {
+		o.input = os.Stdin
+		o.reader = bufio.NewReader(o.input)
+	}
+	if o.stderr == nil {
+		o.stderr = os.Stderr
+	}
+	fmt.Fprint(o.stderr, prompt+": ")
 	if o.passwordStdin {
-		line, e := bufio.NewReader(os.Stdin).ReadString('\n')
+		line, e := o.reader.ReadString('\n')
 		if e != nil && len(line) == 0 {
 			return "", e
 		}
 		return strings.TrimRight(line, "\r\n"), nil
 	}
-	if !term.IsTerminal(int(os.Stdin.Fd())) {
+	f, ok := o.input.(*os.File)
+	if !ok || !term.IsTerminal(int(f.Fd())) {
 		return "", errors.New("vault password requires a terminal; use --password-stdin for explicit stdin input")
 	}
-	b, e := term.ReadPassword(int(os.Stdin.Fd()))
-	fmt.Fprintln(os.Stderr)
+	b, e := term.ReadPassword(int(f.Fd()))
+	fmt.Fprintln(o.stderr)
 	defer vcrypto.Clear(b)
 	return string(b), e
 }
 func humanAPI(o *options) (*api.Client, error) {
-	t, e := credentials.Get(o.origin)
-	if e != nil {
-		return nil, e
+	t, e := o.deps.getToken(o.origin)
+	if errors.Is(e, credentials.ErrNotFound) && o.legacyOrigin != "" && o.legacyOrigin != o.origin {
+		t, e = o.deps.getToken(o.legacyOrigin)
+		if e == nil {
+			if e = o.deps.setToken(o.origin, t); e != nil {
+				return nil, fmt.Errorf("could not migrate legacy keychain credential: %w", e)
+			}
+			if e = o.deps.deleteToken(o.legacyOrigin); e != nil {
+				return nil, fmt.Errorf("credential migrated but could not remove legacy keychain entry: %w", e)
+			}
+		}
 	}
-	return api.New(o.origin, t)
+	if e != nil {
+		return nil, fmt.Errorf("%s; %w", loginHint(o.origin), e)
+	}
+	a, e := api.New(o.origin, t)
+	if e == nil {
+		a.LoginHint = loginHint(o.origin)
+	}
+	return a, e
 }
 func unlocked(ctx context.Context, o *options) (*vault.Client, error) {
 	if raw := os.Getenv("ENVAULT_MACHINE"); raw != "" {

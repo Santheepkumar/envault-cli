@@ -12,22 +12,31 @@ import (
 )
 
 type Client struct {
-	BaseURL string
-	Token   string
-	HTTP    *http.Client
+	BaseURL   string
+	Token     string
+	HTTP      *http.Client
+	LoginHint string
 }
 type Error struct {
 	Code    string
 	Message string
 	Status  int
+	Hint    string
 }
 
-func (e *Error) Error() string { return fmt.Sprintf("%s: %s", e.Code, e.Message) }
+func (e *Error) Error() string {
+	message := fmt.Sprintf("%s: %s", e.Code, e.Message)
+	if e.Hint != "" {
+		message += "; " + e.Hint
+	}
+	return message
+}
 func New(origin, token string) (*Client, error) {
-	if e := config.ValidateURL(origin); e != nil {
+	var e error
+	if origin, e = config.NormalizeURL(origin); e != nil {
 		return nil, e
 	}
-	return &Client{origin, token, &http.Client{Timeout: 30 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
+	return &Client{BaseURL: origin, Token: token, HTTP: &http.Client{Timeout: 30 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
 }
 func (c *Client) Do(ctx context.Context, method, path string, input, output any) error {
 	var data []byte
@@ -72,7 +81,11 @@ func (c *Client) Do(ctx context.Context, method, path string, input, output any)
 		if json.Unmarshal(body, &result) != nil {
 			return fmt.Errorf("server returned HTTP %d", response.StatusCode)
 		}
-		return &Error{result.Error.Code, result.Error.Message, response.StatusCode}
+		hint := ""
+		if response.StatusCode == http.StatusUnauthorized {
+			hint = c.LoginHint
+		}
+		return &Error{Code: result.Error.Code, Message: result.Error.Message, Status: response.StatusCode, Hint: hint}
 	}
 	if output != nil {
 		return json.Unmarshal(body, output)

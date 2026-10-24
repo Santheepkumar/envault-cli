@@ -7,6 +7,8 @@ import (
 
 const service = "EnVault"
 
+var ErrNotFound = keyring.ErrNotFound
+
 func Get(origin string) (string, error) {
 	v, e := keyring.Get(service, origin)
 	if e != nil {

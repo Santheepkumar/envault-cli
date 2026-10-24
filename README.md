@@ -11,13 +11,16 @@ The public Go module is `github.com/Santheepkumar/envault-cli`. Build or install
 
 Application operators should follow the private application repository’s local setup and testing guides. This public repository’s [release guide](docs/releases.md) is self-contained for binary verification and installation.
 
+For complete workflows, multi-project examples, every command and flag, team access, recovery, and CI, read the [CLI user guide](docs/user-guide.md).
+
 ## Daily workflow
 
 Create your account and recovery kit in your team's dashboard first. Keep the vault password separate from GitHub sign-in.
 
 ```sh
-envault login --api-url https://your-envault.example
-envault init --api-url https://your-envault.example --project PROJECT_UUID
+envault login
+envault init
+envault status
 envault pull --env dev --file .env
 # Edit your local .env, then:
 envault push --env dev --file .env
@@ -30,7 +33,20 @@ envault restore REVISION_UUID --env dev
 envault logout
 ```
 
-`init --name NAME` creates a new project using an unlocked vault. `.envault.json` contains only the application origin and project ID; exclude it and your `.env` files from Git. `pull --force` explicitly confirms replacement of an existing regular file. Pull refuses symlink output. Unix files use mode 0600; Windows output uses an owner/System DACL. Native platform CI checks builds, process-tree cancellation and smoke execution. Synchronization preserves CRLF, BOM, multiline values and trailing newlines byte for byte; process injection separately parses supported dotenv syntax.
+`login` defaults to the hosted installation at `https://d3z7pylxp15sx.cloudfront.net`, opens your browser, and remembers the installation after approval. Use `login --no-browser` to open the printed approval URL yourself. For a self-hosted installation, supply the URL once:
+
+```sh
+envault login --api-url https://your-envault.example
+envault init
+```
+
+`init` offers a project picker, including an option to create a project. Selecting an existing project does not require your vault password. Scripts can use `init --project PROJECT_UUID` or `init --name NAME`; creating a project unlocks the vault. These flags are mutually exclusive. Repeating `init` for the same binding is harmless. To choose a different project, run `init --force` interactively, or use `init --project PROJECT_UUID --force` in scripts. Relinking from a subdirectory updates the nearest existing binding.
+
+Commands find the nearest `.envault.json` in the current directory or its parents. File arguments still resolve relative to your current directory. The installation comes from `--api-url`, then the project binding, then the remembered user installation, then the hosted default. Project commands reject a conflicting `--api-url` unless `--project` is also supplied explicitly. Use `init` to save a new binding. Local development requires `login --api-url http://127.0.0.1:3000` once.
+
+`status` checks authentication without unlocking your vault and reports the installation, configuration source, and project. Machine credentials report their configured installation and scope without a remote authentication check. Logout removes the selected token but remembers the installation address. The user configuration at the OS user-config directory under `envault/config.json` contains only `apiUrl`, never tokens or keys.
+
+`.envault.json` contains only the application origin and project ID; exclude it and your `.env` files from Git. `pull --force` explicitly confirms replacement of an existing regular file. Pull refuses symlink output. Unix files use mode 0600; Windows output uses an owner/System DACL. Native platform CI checks builds, process-tree cancellation and smoke execution. Synchronization preserves CRLF, BOM, multiline values and trailing newlines byte for byte; process injection separately parses supported dotenv syntax.
 
 Human tokens live in macOS Keychain, Windows Credential Manager, or Linux Secret Service. There is no plaintext-token fallback. Headless Linux needs an available keyring for human login; use a machine credential in CI. Vault passwords are prompted without echo for each encryption operation. `--password-stdin` accepts one password line explicitly; never pass passwords as command-line arguments.
 
