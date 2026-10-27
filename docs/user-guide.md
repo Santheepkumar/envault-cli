@@ -65,7 +65,7 @@ envault init
 envault status
 ```
 
-`login` uses `https://d3z7pylxp15sx.cloudfront.net` for a fresh installation. In a terminal it opens the browser, prints the approval URL and code, and waits for you to approve the matching code. The approval request expires after 10 minutes. After approval, the CLI stores a 30-day human token in the OS keychain and remembers the installation address.
+`login` uses `https://envault.strawhatdevs.com` for a fresh installation. In a terminal it opens the browser, prints the approval URL and code, and waits for you to approve the matching code. The approval request expires after 10 minutes. After approval, the CLI stores a 30-day human token in the OS keychain and remembers the installation address.
 
 If browser opening is unavailable, open the printed URL yourself. To prevent automatic opening:
 

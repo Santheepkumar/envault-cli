@@ -33,7 +33,7 @@ envault restore REVISION_UUID --env dev
 envault logout
 ```
 
-`login` defaults to the hosted installation at `https://d3z7pylxp15sx.cloudfront.net`, opens your browser, and remembers the installation after approval. Use `login --no-browser` to open the printed approval URL yourself. For a self-hosted installation, supply the URL once:
+`login` defaults to the hosted installation at `https://envault.strawhatdevs.com`, opens your browser, and remembers the installation after approval. Use `login --no-browser` to open the printed approval URL yourself. For a self-hosted installation, supply the URL once:
 
 ```sh
 envault login --api-url https://your-envault.example

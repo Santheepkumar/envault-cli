@@ -126,6 +126,6 @@ Official references: [GoReleaser checks](https://goreleaser.com/cmd/goreleaser_c
 
 ## Onboarding rollout
 
-The onboarding update changes fresh CLI installations from localhost to the hosted origin `https://d3z7pylxp15sx.cloudfront.net`. Local and self-hosted users supply `login --api-url ORIGIN` once; existing project bindings retain their origin. The protocol and machine bundle format are unchanged.
+The onboarding update changes fresh CLI installations from localhost to the hosted origin `https://envault.strawhatdevs.com`. Local and self-hosted users supply `login --api-url ORIGIN` once; existing project bindings retain their origin. The protocol and machine bundle format are unchanged.
 
 Publish and verify the native CLI release before deploying dashboard quick-reference instructions that omit repeated URLs. After the reviewed CLI commit is available in the public repository, update the private application's pinned CLI reference in `.github/workflows/ci.yml` to that exact commit and run application compatibility CI. Do not point the pin at an unpublished or guessed commit. Source changes alone do not establish native browser/keychain verification or release readiness.

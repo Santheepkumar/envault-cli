@@ -16,7 +16,7 @@ type Project struct {
 	ProjectID string `json:"projectId"`
 }
 
-const DefaultOrigin = "https://d3z7pylxp15sx.cloudfront.net"
+const DefaultOrigin = "https://envault.strawhatdevs.com"
 
 type User struct {
 	APIURL string `json:"apiUrl"`
